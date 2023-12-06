@@ -4,6 +4,9 @@ const app = express();
 require("dotenv").config();
 const passport = require("passport");
 
+// setting view engine
+app.set("view engine", "ejs");
+
 // Middlewares
 app.use(passport.initialize());
 app.use(passport.session());
@@ -20,7 +23,7 @@ passport.deserializeUser(function (obj, cb) {
 require("./model/index");
 
 app.get("/", (req, res) => {
-  res.send("Connected SuccessFully");
+  res.render("home.ejs");
 });
 
 // google login here
@@ -35,7 +38,9 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
+      console.log(profile);
       userProfile = profile;
+      console.log(userProfile);
       return done(null, userProfile);
     }
   )
