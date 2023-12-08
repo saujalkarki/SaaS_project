@@ -3,6 +3,9 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const passport = require("passport");
+const { users } = require("./model/index");
+const jwt = require("jsonwebtoken");
+const generateToken = require("./services/generateToken");
 
 // setting view engine
 app.set("view engine", "ejs");
@@ -56,8 +59,31 @@ app.get(
   passport.authenticate("google", {
     failureRedirect: "http://localhost:3000",
   }),
-  function (req, res) {
-    res.send("Logged in Successfully");
+  async function (req, res) {
+    const userGoogleEmail = userProfile.emails[0].value;
+    // check if google lay deko email already table ma exists xa ki nae vanerw
+    const user = await users.findOne({
+      where: {
+        email: userGoogleEmail,
+      },
+    });
+    if (user) {
+      // token generate garney
+      const token = generateToken(user);
+      res.cookie("token", token);
+      res.redirect("/addOrganization");
+    } else {
+      // register the user
+      const user = await users.create({
+        email: userGoogleEmail,
+        googleId: userProfile.id,
+        username: userProfile.displayName,
+      });
+
+      const token = generateToken(user);
+      res.cookie("token", token);
+      res.redirect("/addOrganization");
+    }
   }
 );
 
