@@ -1,3 +1,3 @@
 exports.renderOrganizationForm = (req, res) => {
-  res.render("addOrganization");
+  res.render("organization");
 };

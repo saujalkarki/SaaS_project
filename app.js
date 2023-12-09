@@ -6,6 +6,7 @@ const passport = require("passport");
 const { users } = require("./model/index");
 const jwt = require("jsonwebtoken");
 const generateToken = require("./services/generateToken");
+const organizationRoute = require("./routes/organizationRoute");
 
 // setting view engine
 app.set("view engine", "ejs");
@@ -71,7 +72,7 @@ app.get(
       // token generate garney
       const token = generateToken(user);
       res.cookie("token", token);
-      res.redirect("/addOrganization");
+      res.redirect("/organization");
     } else {
       // register the user
       const user = await users.create({
@@ -82,10 +83,13 @@ app.get(
 
       const token = generateToken(user);
       res.cookie("token", token);
-      res.redirect("/addOrganization");
+      res.redirect("/organization");
     }
   }
 );
+
+// routes middlewares
+app.use("/", organizationRoute);
 
 // PORT connection
 const PORT = process.env.PORT || 4000;
